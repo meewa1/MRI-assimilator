@@ -1,0 +1,13 @@
+/build/
+/dist/
+/__pycache__/
+/Other pictures/
+/Other files/
+
+*.m4a
+*.docx
+*.pdf
+*.iss
+*.qhc
+*.qhcp
+*.txt
