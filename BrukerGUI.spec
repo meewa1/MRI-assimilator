@@ -36,7 +36,7 @@ a = Analysis(['main.py'],
                             'scipy.special','scipy.stats','scipy.version'],
              hookspath=[],
              runtime_hooks=[],
-             excludes=[],
+             excludes=['E:\\Users\\Mikhail\\Documents\\Physics\\IGIL\\Work\\Bruker\\BrukerGUI\\Launcher.py'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher)
