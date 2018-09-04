@@ -16,6 +16,7 @@ from BrukerGraphicsLayoutWidget import *
 from ImageScrollBar import *
 from FilesTreeWidget import *
 from BrukerThreads import *
+from SaveToolButton import *
 
 import numpy as np
 import re
@@ -42,16 +43,6 @@ CONTRAST = {
     "init" : 100
 }
 
-# necessary for path in PyInstaller
-def resource_path(relative_path, folder = ""):
-    """ Get absolute path to resource, works for dev and for PyInstaller """
-    try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(folder)
-
-    return os.path.join(base_path, relative_path)
 
 class dockTreeWidget(QtWidgets.QDockWidget):
     def __init__(self, title, parent = None):
@@ -101,7 +92,7 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
         self.center()
 
         self.setWindowTitle(self.tr('BrukerGUI'))
-        Logo = resource_path("pictures\\LogoBruker.png")
+        Logo = utils.resource_path("pictures\\LogoBruker.png")
         self.setWindowIcon(QIcon(Logo))
 
         self.createViewerArea()
@@ -270,6 +261,11 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
     def createTreeContextMenu(self, point):
         index = self.tree.indexAt(point)
 
+        self.itemDeleted = False
+
+        def DeleteTriggered():
+            self.itemDeleted = True
+
         if not index.isValid():
             return
 
@@ -286,6 +282,8 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
 
             deleteExpNumAct = QtWidgets.QAction(self.tr('Delete selected experiment number'), self, 
                                                 triggered=partial(self.tree.deleteExpNumItem, item))
+
+            deleteExpNumAct.triggered.connect(DeleteTriggered)
 
             self.popMenu.addAction(deleteExpNumAct)
             if item.checkState(0) == QtCore.Qt.Checked:
@@ -305,9 +303,11 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
                 self.popMenu.addAction(self.correctNegativeAct)
 
                 self.popMenu.exec_(QCursor.pos())
-                self.tree.ImageData[expName][expNum]["correction"] = self.correctNegative
-                self.tree.removeItemsColorFront(item)
-                self.scroll.valueChanged.emit(self.scroll.value())
+
+                if not self.itemDeleted:
+                    self.tree.ImageData[expName][expNum]["correction"] = self.correctNegative
+                    self.tree.removeItemsColorFront(item)
+                    self.scroll.valueChanged.emit(self.scroll.value())
             else:
                 self.popMenu.exec_(QCursor.pos())
 
@@ -422,8 +422,8 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
 
     def createSliderToolbar(self):
 
-        tb = QtWidgets.QToolBar(self.tr("Image Toolbar"))
-        self.addToolBar(tb)
+        self.tbContrBright = QtWidgets.QToolBar(self.tr("Image Toolbar"))
+        self.addToolBar(self.tbContrBright)
 
         applyButton = QtWidgets.QRadioButton(self.tr("Apply to the series"), self)
         applyButton.clicked.connect(self.setApplySeries)
@@ -446,6 +446,7 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
         self.contrValueSpinBox.setValue(CONTRAST["init"]/CONTRAST["conv"])
 
         self.contrValueSpinBox.valueChanged.connect(self.setContrast)
+
         self.contrSlider.valueChanged.connect(self.setContrast)
 
         spacer1 = QtWidgets.QLabel("    ")
@@ -475,22 +476,25 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
         resetButton = QtWidgets.QPushButton(self.tr("Reset"))
         resetButton.clicked.connect(self.resetCnB)
 
-        tb.addWidget(applyButton)
-        tb.addSeparator()
-        tb.addWidget(brightLabel)
-        tb.addWidget(self.brightSlider)
-        tb.addWidget(spacer2)
-        tb.addWidget(self.brightValueSpinBox)
+        self.tbContrBright.addWidget(applyButton)
+        self.tbContrBright.addSeparator()
+        self.tbContrBright.addWidget(brightLabel)
+        self.tbContrBright.addWidget(self.brightSlider)
+        self.tbContrBright.addWidget(spacer2)
+        self.tbContrBright.addWidget(self.brightValueSpinBox)
 
-        tb.addSeparator()
+        self.tbContrBright.addSeparator()
 
-        tb.addWidget(contrLabel)
-        tb.addWidget(self.contrSlider)
-        tb.addWidget(spacer1)
-        tb.addWidget(self.contrValueSpinBox)
+        self.tbContrBright.addWidget(contrLabel)
+        self.tbContrBright.addWidget(self.contrSlider)
+        self.tbContrBright.addWidget(spacer1)
+        self.tbContrBright.addWidget(self.contrValueSpinBox)
 
-        tb.addSeparator()
-        tb.addWidget(resetButton)
+        self.tbContrBright.addSeparator()
+        self.tbContrBright.addWidget(resetButton)
+
+        # set disabled toolbar for the initial state
+        self.tbContrBright.setDisabled(True)
 
     def createStatusBar(self):
 
@@ -523,37 +527,38 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
         self.setStatusBar(self.status)
 
     def createToolsToolbar(self):
+
         tools_tb = QtWidgets.QToolBar(self.tr("Tools Toolbar"))
         self.addToolBar(tools_tb) 
 
-        self.openDirAct.setIcon(QIcon(resource_path("pictures\\Open_Folder.ico")))
-        self.addExpAct.setIcon(QIcon(resource_path("pictures\\Add_List.ico")))
-        self.saveImageAsAct.setIcon(QIcon(resource_path("pictures\\Save_Image_As.ico")))
+        self.openDirAct.setIcon(QIcon(utils.resource_path("pictures\\Open_Folder.ico")))
+        self.addExpAct.setIcon(QIcon(utils.resource_path("pictures\\Add_List.ico")))
+        self.saveImageAsAct.setIcon(QIcon(utils.resource_path("pictures\\Save_Image_As.ico")))
 
-        self.saveExpAsbutton = QtWidgets.QToolButton(self)
+        self.saveExpAsbutton = SaveToolButton(self)
         self.saveExpAsbutton.setMenu(self.saveExpAs)
-        self.saveExpAsbutton.setIcon(QIcon(resource_path("pictures\\Save_Exp_As.ico")))
+        self.saveExpAsbutton.setIcon(QIcon(utils.resource_path("pictures\\Save_Exp_As.ico")))
         self.saveExpAsbutton.setToolTip(self.tr("Save Current Experiment Number As..."))
         self.saveExpAsbutton.setPopupMode(QtWidgets.QToolButton.MenuButtonPopup)
         self.saveExpAsbutton.setDisabled(True)
 
-        self.saveAllCheckedAsbutton = QtWidgets.QToolButton(self)
+        self.saveAllCheckedAsbutton = SaveToolButton(self)
         self.saveAllCheckedAsbutton.setMenu(self.saveAllCheckedAs)
-        self.saveAllCheckedAsbutton.setIcon(QIcon(resource_path("pictures\\Save_All_As.ico")))
+        self.saveAllCheckedAsbutton.setIcon(QIcon(utils.resource_path("pictures\\Save_All_As.ico")))
         self.saveAllCheckedAsbutton.setToolTip(self.tr("Save All Checked Experiments As..."))
         self.saveAllCheckedAsbutton.setPopupMode(QtWidgets.QToolButton.MenuButtonPopup)
         self.saveAllCheckedAsbutton.setDisabled(True)
 
-        self.zoomInAct.setIcon(QIcon(resource_path("pictures\\Zoom_In.ico")))
-        self.zoomOutAct.setIcon(QIcon(resource_path("pictures\\Zoom_Out.ico")))
+        self.zoomInAct.setIcon(QIcon(utils.resource_path("pictures\\Zoom_In.ico")))
+        self.zoomOutAct.setIcon(QIcon(utils.resource_path("pictures\\Zoom_Out.ico")))
         #self.zoomBox = QtWidgets.QComboBox(self)
         #self.zoomBox.addItems(["25%", "50%", "100%", "125%", "150%", "200%"])
 
-        self.rotateLeftAct.setIcon(QIcon(resource_path("pictures\\rotate_left.ico")))
-        self.rotateRightAct.setIcon(QIcon(resource_path("pictures\\rotate_right.ico")))
-        self.zoomToFitAct.setIcon(QIcon(resource_path("pictures\\Zoom_Fit.ico")))
+        self.rotateLeftAct.setIcon(QIcon(utils.resource_path("pictures\\rotate_left.ico")))
+        self.rotateRightAct.setIcon(QIcon(utils.resource_path("pictures\\rotate_right.ico")))
+        self.zoomToFitAct.setIcon(QIcon(utils.resource_path("pictures\\Zoom_Fit.ico")))
 
-        self.tagInfo.setIcon(QIcon(resource_path("pictures\\Tag_Info.ico")))
+        self.tagInfo.setIcon(QIcon(utils.resource_path("pictures\\Tag_Info.ico")))
 
         tools_tb.addAction(self.openDirAct)
         tools_tb.addAction(self.addExpAct)
@@ -564,7 +569,9 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
         tools_tb.addSeparator()
         tools_tb.addAction(self.zoomInAct)
         tools_tb.addAction(self.zoomOutAct)
+
         #tools_tb.addWidget(self.zoomBox)
+
         tools_tb.addSeparator()
         tools_tb.addAction(self.rotateLeftAct)
         tools_tb.addAction(self.rotateRightAct)
@@ -604,7 +611,6 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
             self.en_GBAct.setChecked(True)
 
     def LangConfirmWarninig(self, lang):
-        import brkRebootConst
         msgbox = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning,
                                        self.tr("Language Choice Confirmation"),
                                        self.tr("The application must be restarted to display\n"
@@ -623,7 +629,7 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
         if msgbox.clickedButton() == yes_btn:
             setting = QtCore.QSettings("locale","language")
             setting.setValue("lang", lang)
-            QtWidgets.qApp.exit(brkRebootConst.EXIT_CODE_REBOOT)
+            QtWidgets.qApp.exit(utils.EXIT_CODE_REBOOT)
             return True
         elif msgbox.clickedButton() == no_btn:
             return False
@@ -987,10 +993,10 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
 
         idx = self.scroll.value()
 
-        file_formats = ["Text files (*.txt)", "XML(*.xml *.xsd *.xslt *.tld *.dtml *.opml *.svg)",
-                         "Images (*.png *.jpg *.tif *.bmp)", "AllFiles(*)"]
+        file_formats = ["Images (*.png *.jpg *.tif *.bmp)", "Text files (*.txt, *.dat)",
+                        "XML(*.xml *.xsd *.xslt *.tld *.dtml *.opml *.svg)", "AllFiles(*)"]
 
-        default_fname = self.SaveDir + os.sep + '{0}_{1}_{2}.txt'.format(self.curExpName,
+        default_fname = self.SaveDir + os.sep + '{0}_{1}_{2}.png'.format(self.curExpName,
                                                                          self.curExpNum,
                                                                          idx+1)
 
@@ -1133,6 +1139,8 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
 
         self.saveExpAsbutton.setEnabled(state)
 
+        self.tbContrBright.setEnabled(state)
+
     def sliderimage(self, value):
 
         if self.tree.getCurrentImageItem():
@@ -1214,7 +1222,7 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
                                    QtCore.Qt.WindowCloseButtonHint)
         self.winTag.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.winTag.setWindowTitle(self.tr("Image Info"))
-        self.winTag.resize(305,400)
+        self.winTag.resize(350,450)
         self.viewTag = QtWidgets.QTreeView()
 
         self.tagModel.setColumnCount(2)
