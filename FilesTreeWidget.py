@@ -8,9 +8,11 @@ from itertools import compress
 ITEMCOLORS = {
     "imageInit": QBrush(QColor("white")),
     "imageNegative" : QBrush(QColor("yellow"), QtCore.Qt.DiagCrossPattern),
+    "imageNoNegative" : QBrush(QColor("cyan"), QtCore.Qt.DiagCrossPattern),
     "imageCurrent" : QBrush(QColor(0,255,0,128)),
     "numberInit" : QBrush(QColor("white")),
     "numberNegative" : QBrush(QColor("yellow"), QtCore.Qt.DiagCrossPattern),
+    "numberNoNegative" : QBrush(QColor("cyan"), QtCore.Qt.DiagCrossPattern),
     "numberCurrent" : QBrush(QColor(255,150,0, 128)),
     "nameInit" : QBrush(QColor("white")),
     "nameCurrent" : QBrush(QColor("lightGray"))
@@ -369,23 +371,29 @@ class FilesTreeWidget(QtWidgets.QTreeWidget):
 
     def removeItemsColorBack(self, item):
         # redraw items in initial color
-        if item and item.parent():
-            self.setInitItemColor(item)
-            if not self.isNameItem(item):
-                self.setNegativeItemColor(item)
+        try:
+            if item:
+                self.setInitItemColor(item)
+                if not self.isNameItem(item):
+                    self.setNegativeItemColor(item)
 
-            self.removeItemsColorBack(item.parent())
+                self.removeItemsColorBack(item.parent())
+        except Exception as err:
+            utils.logger.warning(err)
 
     def removeItemsColorFront(self, item):
-        if item and item.parent():
-            self.setInitItemColor(item)
-            if not self.isNameItem(item):
-                self.setNegativeItemColor(item)
+        try:
+            if item:
+                self.setInitItemColor(item)
+                if not self.isNameItem(item):
+                    self.setNegativeItemColor(item)
 
-            if item.child(0):
-                for idx in range(item.childCount()):
-                    if item.child(idx):
-                        self.removeItemsColorFront(item.child(idx))
+                if item.child(0):
+                    for idx in range(item.childCount()):
+                        if item.child(idx):
+                            self.removeItemsColorFront(item.child(idx))
+        except Exception as err:
+            utils.logger.warning(err)
 
     def sameNumberItem(self):
         return self.getExpNumberItem(self.prev_imageItem) == self.getCurrentNumberItem()
@@ -421,7 +429,7 @@ class FilesTreeWidget(QtWidgets.QTreeWidget):
         self.CurrentItem = item
 
     def setInitItemColor(self, item):
-        if item.parent():
+        if item:
             if self.isNameItem(item):
                 item.setBackground(0, ITEMCOLORS["nameInit"])
 
@@ -441,6 +449,11 @@ class FilesTreeWidget(QtWidgets.QTreeWidget):
                         item.setBackground(0, ITEMCOLORS["numberNegative"])
                     elif self.isImageItem(item):
                         item.setBackground(0, ITEMCOLORS["imageNegative"])
+                else:
+                    if self.isNumberItem(item):
+                        item.setBackground(0, ITEMCOLORS["numberNoNegative"])
+                    elif self.isImageItem(item):
+                        item.setBackground(0, ITEMCOLORS["imageNoNegative"])
 
     def sizeHint(self):
         return QtCore.QSize(165, 140)
