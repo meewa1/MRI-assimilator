@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+EXIT_CODE_REBOOT = -123456
+
 """
 A collection of miscellaneous utility functions.
 """
@@ -60,6 +62,17 @@ Any pre-existing files will be removed first.
             if os.path.exists(dst_file):
                 os.remove(dst_file)
             shutil.move(src_file, dst_dir)
+
+# necessary for path in PyInstaller
+def resource_path(relative_path, folder = ""):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(folder)
+
+    return os.path.join(base_path, relative_path)
 
 def sort_dict(diction):
     sort_list = sorted(list(diction.items()), key = lambda x: float(x[0]))

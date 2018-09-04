@@ -2,17 +2,6 @@
 # -*- coding: utf-8 -*-
 import sys, os
 
-# necessary for path in PyInstaller
-def resource_path(relative_path, folder = ""):
-	""" Get absolute path to resource, works for dev and for PyInstaller """
-	try:
-		# PyInstaller creates a temp folder and stores path in _MEIPASS
-		base_path = sys._MEIPASS
-	except Exception:
-		base_path = os.path.abspath(folder)
-
-	return os.path.join(base_path, relative_path)
-
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QSplashScreen
 
@@ -55,23 +44,26 @@ def switchQtTranslator(cur_lang):
 	switchTranslator(translatorQt_multimedia,
 					 "qtmultimedia_" + cur_lang, pathToTransaltionsQT)
 
-import brkRebootConst
 import io
+from utils import EXIT_CODE_REBOOT
 
 if __name__ == '__main__':
+
 	sys.stdout = buf = io.StringIO()
-	currentExitCode = brkRebootConst.EXIT_CODE_REBOOT
-	while currentExitCode == brkRebootConst.EXIT_CODE_REBOOT:
+
+	currentExitCode = EXIT_CODE_REBOOT
+	while currentExitCode == EXIT_CODE_REBOOT:
 
 		app = QApplication.instance() # checks if QApplication already exists
 		if not app: # create QApplication if it doesnt exist
 			app = QApplication(sys.argv)
+			
 		app.aboutToQuit.connect(app.deleteLater)
 		
-		LoadScreen = resource_path(r"pictures\BrukerSplashScreen.png")
-		splashscreen = QSplashScreen(QPixmap(LoadScreen))
+		# LoadScreen = utils.resource_path(r"pictures\BrukerSplashScreen.png")
+		# splashscreen = QSplashScreen(QPixmap(LoadScreen))
 		
-		splashscreen.show()	
+		# splashscreen.show()
 
 		from PyQt5.QtCore import Qt, QTranslator, QSettings
 
@@ -80,22 +72,22 @@ if __name__ == '__main__':
 		if not cur_lang:
 			setting.setValue("lang", "ru_RU")
 			cur_lang = "ru_RU"
-			
+
+		from utils import resource_path
 		translator = QTranslator()
 		switchTranslator(translator, 
 						 resource_path(r"translations\BrukerGUI_{}".format(cur_lang)))
 
-		splashscreen.showMessage(app.translate("SplachScreen","Version 1.0 (c) 2018"),
-								 Qt.AlignBottom | Qt.AlignCenter)
+		# splashscreen.showMessage(app.translate("SplachScreen","Version 1.0 (c) 2018"),
+		# 						 Qt.AlignBottom | Qt.AlignCenter)
 
 		switchQtTranslator(cur_lang)
 
 		from brukerGUI import BrukerMainWindow
 		main = BrukerMainWindow()
 
-		splashscreen.finish(main)
+		#splashscreen.finish(main)
 	   # app.installEventFilter(ex)
 		currentExitCode = app.exec_()
-		buf.getvalue()
+		#buf.getvalue()
 		app = None # delete the QApplication object
-	#sys.exit(app.exec_())
