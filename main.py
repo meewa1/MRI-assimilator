@@ -5,6 +5,28 @@ import sys, os
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QSplashScreen
 
+# disable PyQt messages in the console
+def handler(msg_type, msg_log_context, msg_string):
+	pass
+	# from utils import logger
+    # if (msg_type == 0):
+    #     logger.info("Debug: %s (%s:%u, %s)\n" % (msg_string, msg_log_context.file, msg_log_context.line, msg_log_context.function))
+
+    # elif (msg_type == 1):
+    #     logger.warning("Warning: %s (%s:%u, %s)\n" % (msg_string, msg_log_context.file, msg_log_context.line, msg_log_context.function))
+
+    # elif (msg_type == 2):
+    #     logger.error("Critical: %s (%s:%u, %s)\n" % (msg_string, msg_log_context.file, msg_log_context.line, msg_log_context.function))
+
+    # elif (msg_type == 3):
+    #     logger.error("Fatal: %s (%s:%u, %s)\n" % (msg_string, msg_log_context.file, msg_log_context.line, msg_log_context.function))
+
+    # elif (msg_type == 4):
+    #     logger.info("Info: %s (%s:%u, %s)\n" % (msg_string, msg_log_context.file, msg_log_context.line, msg_log_context.function))
+
+from PyQt5.QtCore import qInstallMessageHandler
+qInstallMessageHandler(handler)
+
 def switchTranslator(translator, filename, path = ""):
 	QApplication.removeTranslator(translator)
 
