@@ -4,6 +4,8 @@ BrukerGUI is a graphical interface for displaying and processing data obtained f
 
 The application also allows you to save images or a series of images in a convenient way for later processing.
 
+![gui_example](https://github.com/meewa1/BrukerGUI/pictures/MainWindow.png)
+
 ## Requirements
  + Python 3.6
  + Libraries:
