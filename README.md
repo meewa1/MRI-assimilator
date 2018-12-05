@@ -4,7 +4,7 @@ MRI-assimilator is a graphical interface for displaying and processing data obta
 
 The application also allows you to save images or a series of images in a convenient way for later processing.
 
-![gui_example](https://github.com/meewa1/MRI-assimilator/pictures/MainWindow.png)
+![gui_example](https://github.com/meewa1/MRI-assimilator/blob/master/MRIAssimilator/pictures/MainWindow.png)
 
 ## Requirements
  + Python 3.6
