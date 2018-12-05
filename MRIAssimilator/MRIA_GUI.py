@@ -9,13 +9,14 @@ from PyQt5 import QtCore, QtWidgets
 
 from pyqtgraph import ImageItem
 
-import bruker
+import brukerReader as br
+import brukerWriter as bw
 import utils
 
-from BrukerGraphicsLayoutWidget import *
+from MRIAGraphicsLayoutWidget import *
 from ImageScrollBar import *
 from FilesTreeWidget import *
-from BrukerThreads import *
+from MRIAThreads import *
 from SaveToolButton import *
 
 import numpy as np
@@ -55,14 +56,14 @@ class dockTreeWidget(QtWidgets.QDockWidget):
     def sizeHint(self):
         return QtCore.QSize(165, 140)
 
-class BrukerSlider(QtWidgets.QSlider):
+class MRIASlider(QtWidgets.QSlider):
     def __init__(self, orientation, parent=None):
         super().__init__(orientation, parent)
 
     def sizeHint(self):
         return QtCore.QSize(80, 27)
 
-class BrukerMainWindow(QtWidgets.QMainWindow):
+class MRIAMainWindow(QtWidgets.QMainWindow):
     signalCheck = QtCore.pyqtSignal(str)
 
     def __init__(self):
@@ -91,8 +92,8 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
         self.resize(self.hsize, self.vsize)
         self.center()
 
-        self.setWindowTitle(self.tr('BrukerGUI'))
-        Logo = utils.resource_path("pictures\\LogoBruker.png")
+        self.setWindowTitle('MRI-assimilator')
+        Logo = utils.resource_path("pictures\\LogoMRIA.png")
         self.setWindowIcon(QIcon(Logo))
 
         self.createViewerArea()
@@ -121,11 +122,11 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
     #         pos = event.pos()
     #         self.x_coord_label.setText("X: {}".format(pos.x()))
     #         self.y_coord_label.setText("Y: {}".format(pos.y()))
-    #         self.name_label.setText(str(BrukerGraphicsLayoutWidget))
+    #         self.name_label.setText(str(MRIAGraphicsLayoutWidget))
     #     return QtWidgets.QMainWindow.eventFilter(self, source, event)
 
     def about(self):
-        QtWidgets.QMessageBox.about(self, self.tr("About BrukerGUI"),
+        QtWidgets.QMessageBox.about(self, self.tr("About MRI-assimilator"),
                                     self.tr("This is a GUI for imaging bruker data"))
     def addExp(self):
 
@@ -430,7 +431,7 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
 
         contrLabel = QtWidgets.QLabel(self.tr("Contrast: "), self)
 
-        self.contrSlider = BrukerSlider(QtCore.Qt.Horizontal, self)
+        self.contrSlider = MRIASlider(QtCore.Qt.Horizontal, self)
         self.contrSlider.setTickPosition(QtWidgets.QSlider.TicksBelow)        
         self.contrSlider.setMinimum(CONTRAST["min"])
         self.contrSlider.setMaximum(CONTRAST["max"])
@@ -454,7 +455,7 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
 
         brightLabel = QtWidgets.QLabel(self.tr("Brightness: "), self)
 
-        self.brightSlider = BrukerSlider(QtCore.Qt.Horizontal, self)
+        self.brightSlider = MRIASlider(QtCore.Qt.Horizontal, self)
         self.brightSlider.setTickPosition(QtWidgets.QSlider.TicksBelow)
         self.brightSlider.setMinimum(BRIGHTNESS["min"])
         self.brightSlider.setMaximum(BRIGHTNESS["max"])
@@ -593,7 +594,7 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
         self.tree = FilesTreeWidget(self, self.scroll)
         self.dock.setWidget(self.tree)
 
-        self.win = BrukerGraphicsLayoutWidget(self.scroll, self.tree)
+        self.win = MRIAGraphicsLayoutWidget(self.scroll, self.tree)
         self.win.setGeometry(0,0,100,100)
         # #self.view.setMouseMode(ViewBox.RectMode)
         self.img = ImageItem()
@@ -1028,13 +1029,13 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
             img_data = self.tree.ImageData[self.curExpName][self.curExpNum]["data"]
             # Text format
             if ext in re.findall(r"\.\w+", file_formats[0]):
-                bruker.SingleWriteToTextFile(fname = fname[0], 
+                bw.SingleWriteToTextFile(fname = fname[0], 
                                              data = img_data, 
                                              index = idx, 
                                              create = True)
             # XML format
             elif ext in re.findall(r"\.\w+", file_formats[1]):
-                bruker.SingleWriteToXMLFile(fname = fname[0], 
+                bw.SingleWriteToXMLFile(fname = fname[0], 
                                             data = img_data, 
                                             index = idx, 
                                             create = True)
@@ -1165,7 +1166,7 @@ class BrukerMainWindow(QtWidgets.QMainWindow):
             self.img.setLevels([0, 1])
 
             if img_data["data"].min_val < 0 and img_data["correction"]:
-                correctdata = bruker.CorrectBrukerData(img_data["data"]).astype(float)
+                correctdata = br.CorrectBrukerData(img_data["data"]).astype(float)
                 min_val = np.amin(correctdata)
                 max_val = np.amax(correctdata)
                 rawdata = (np.rot90(correctdata[value,:,:], self.win.getRotation()) - min_val) / (max_val - min_val)

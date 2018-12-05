@@ -2,17 +2,17 @@
 
 block_cipher = None 
 
-added_files = [('E:\\Users\\Mikhail\\Documents\\Physics\\IGIL\\Work\\Bruker\\BrukerGUI\\pictures\\*.png', 'pictures'),
-               ('E:\\Users\\Mikhail\\Documents\\Physics\\IGIL\\Work\\Bruker\\BrukerGUI\\pictures\\*.ico', 'pictures'),
-               ('E:\\Users\\Mikhail\\Documents\\Physics\\IGIL\\Work\\Bruker\\BrukerGUI\\*.py', ""),
-               ('E:\\Users\\Mikhail\\Documents\\Physics\\IGIL\\Work\\Bruker\\BrukerGUI\\translations\\*.qm', "translations"),
+added_files = [('E:\\Users\\Mikhail\\Documents\\Physics\\IGIL\\Work\\Bruker\\MRI-assimilator\\MRIAssimilator\\pictures\\*.png', 'pictures'),
+               ('E:\\Users\\Mikhail\\Documents\\Physics\\IGIL\\Work\\Bruker\\MRI-assimilator\\MRIAssimilator\\pictures\\*.ico', 'pictures'),
+               ('E:\\Users\\Mikhail\\Documents\\Physics\\IGIL\\Work\\Bruker\\MRI-assimilator\\MRIAssimilator\\*.py', ""),
+               ('E:\\Users\\Mikhail\\Documents\\Physics\\IGIL\\Work\\Bruker\\MRI-assimilator\\MRIAssimilator\\translations\\*.qm', "translations"),
                ('E:\\ProgramData\\Python\\Python36\\Lib\\site-packages\\PyQt5\\Qt\\translations\\qt*_en*.qm', "translations"),
                ('E:\\ProgramData\\Python\\Python36\\Lib\\site-packages\\PyQt5\\Qt\\translations\\qt*_ru*.qm', "translations"),
                ('E:\\ProgramData\\Python\\Python36\\Lib\\site-packages\\scipy\\special\\_ufuncs_cxx.cp36-win_amd64.pyd', '.')
               ]
 
-a = Analysis(['main.py'],
-             pathex=['E:\ProgramData\Python\Python36\Lib\site-packages\PyQt5\Qt\bin', 'E:\\Users\\Mikhail\\Documents\\Physics\\IGIL\\Work\\Bruker\\BrukerGUI',
+a = Analysis(['MRIAssimilator\\main.py'],
+             pathex=['E:\ProgramData\Python\Python36\Lib\site-packages\PyQt5\Qt\bin', 'E:\\Users\\Mikhail\\Documents\\Physics\\IGIL\\Work\\Bruker\\MRI-assimilator\\MRIAssimilator\\',
                      'E:\ProgramData\Python\Python36\Lib\site-packages\PyQt5\Qt\translations'],
              binaries=[('E:\\ProgramData\\Python\\Python36\\Lib\\site-packages\\scipy\\extra-dll\\*', '.')],
              datas=added_files,
@@ -36,7 +36,7 @@ a = Analysis(['main.py'],
                             'scipy.special','scipy.stats','scipy.version'],
              hookspath=[],
              runtime_hooks=[],
-             excludes=['E:\\Users\\Mikhail\\Documents\\Physics\\IGIL\\Work\\Bruker\\BrukerGUI\\Launcher.py'],
+             excludes=[],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher)
@@ -49,16 +49,16 @@ exe = EXE(pyz,
           a.binaries,
           a.zipfiles,
           a.datas,
-          name='BrukerGUI',
+          name='MRI-assimilator',
           debug=False,
           strip=False,
           upx=True,
           runtime_tmpdir=None,
-          console=True, icon='pictures\\LogoBruker.ico')
+          console=True, icon='MRIAssimilator\\pictures\\LogoMRIA.ico')
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
                strip=False,
                upx=True,
-               name='BrukerGUI')
+               name='MRI-assimilator')

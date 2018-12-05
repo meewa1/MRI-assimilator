@@ -3,7 +3,9 @@
 /__pycache__/
 /Other pictures/
 /Other files/
+/Record/
 
+*.tmp
 *.m4a
 *.docx
 *.pdf

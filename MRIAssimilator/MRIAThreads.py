@@ -2,7 +2,7 @@ from PyQt5 import QtCore
 
 import os, tempfile
 from scipy.misc import toimage
-import bruker
+import brukerWriter as bw
 
 import utils
 
@@ -111,7 +111,7 @@ else self.trigger == "single" then only one experiment will be saved without cre
                                                                             exp_num,
                                                                             self.form))
 
-                    eval("bruker.SingleWriteTo{}File".format(self.saveType))(fname,
+                    eval("bw.SingleWriteTo{}File".format(self.saveType))(fname,
                                                                              img_data,
                                                                              i,
                                                                              i==0)
@@ -163,7 +163,7 @@ else self.trigger == "single" then only one experiment will be saved without cre
                                                                         allDim + 1, 
                                                                         self.filename))
 
-                eval("bruker.SingleWriteTo{}File".format(self.saveType))(fname, 
+                eval("bw.SingleWriteTo{}File".format(self.saveType))(fname, 
                                                                          img_data,
                                                                          i,
                                                                          i==0)
@@ -177,7 +177,7 @@ else self.trigger == "single" then only one experiment will be saved without cre
 
             # create a temporary folder
             self.tmp_folder = tempfile.TemporaryDirectory(suffix = ".TMP",
-                                                          prefix="_BrukerGUI_",
+                                                          prefix="_MRIAssimilator_",
                                                           dir = self.SaveDir)
             if self.trigger == "all":
                 self._SaveAllChecked()

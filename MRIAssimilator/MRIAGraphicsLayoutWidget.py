@@ -2,9 +2,9 @@ from pyqtgraph import GraphicsLayoutWidget
 from PyQt5 import QtCore
 import utils
 
-__all__ = ['BrukerGraphicsLayoutWidget']
+__all__ = ['MRIAGraphicsLayoutWidget']
 
-class BrukerGraphicsLayoutWidget(GraphicsLayoutWidget):
+class MRIAGraphicsLayoutWidget(GraphicsLayoutWidget):
     def __init__(self, scroll, tree, parent=None, **kargs):
         super().__init__()
         self.scroll = scroll

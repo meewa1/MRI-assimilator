@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtGui import QBrush,QColor
 
 import utils, inspect, os
-import bruker
+import brukerReader as br
 from itertools import compress
 
 ITEMCOLORS = {
@@ -181,7 +181,7 @@ class FilesTreeWidget(QtWidgets.QTreeWidget):
         """
     Return a tree item following the curitem in descending order.
 
-    If function is called from "BrukerGraphicsLayoutWidget" 
+    If function is called from "MRIAGraphicsLayoutWidget" 
         then items are chosen from all checked experiments.
     If function is called from "ImageScrollBar" 
         then items are chosen from the same experiment as the curitem.
@@ -189,7 +189,7 @@ class FilesTreeWidget(QtWidgets.QTreeWidget):
     IMPORTANT: only image item items are returned
         """
         callingclass = utils.getCallingClassName(inspect.currentframe())
-        if callingclass == "BrukerGraphicsLayoutWidget":
+        if callingclass == "MRIAGraphicsLayoutWidget":
             exp_name = self.getExpNameItem(curitem)
             exp_num = self.getExpNumberItem(curitem)
             curIndex =  exp_num.indexOfChild(curitem)
@@ -251,7 +251,7 @@ class FilesTreeWidget(QtWidgets.QTreeWidget):
         """
     Return a tree item following the curitem in ascending order.
 
-    If function is called from "BrukerGraphicsLayoutWidget" 
+    If function is called from "MRIAGraphicsLayoutWidget" 
         then items are chosen from all checked experiments.
     If function is called from "ImageScrollBar" 
         then items are chosen from the same experiment as the curitem.
@@ -260,7 +260,7 @@ class FilesTreeWidget(QtWidgets.QTreeWidget):
         """
         callingclass = utils.getCallingClassName(inspect.currentframe())
 
-        if callingclass == "BrukerGraphicsLayoutWidget":
+        if callingclass == "MRIAGraphicsLayoutWidget":
             exp_num = self.getExpNumberItem(curitem)
             maxval = int(utils.num_pattern.findall(exp_num.text(0))[-1])
             curIndex =  exp_num.indexOfChild(curitem)
@@ -312,7 +312,7 @@ class FilesTreeWidget(QtWidgets.QTreeWidget):
         first_image = mode == "create"
 
         dirname = os.path.normpath(dirname)
-        files_dir = bruker.ReadDirectory(dirname)
+        files_dir = br.ReadDirectory(dirname)
         for exp_name in files_dir.keys():
 
             items = self.findItems(exp_name,
@@ -340,7 +340,7 @@ class FilesTreeWidget(QtWidgets.QTreeWidget):
                 if not addingItems:
                     self.ImageData[exp_name][exp_num] = {}
                     self.ImageData[exp_name][exp_num]["data"] = \
-                          bruker.ReadExperiment(files_dir, exp_num, exp_name)
+                          br.ReadExperiment(files_dir, exp_num, exp_name)
 
                     img_data = self.ImageData[exp_name][exp_num]["data"]
 

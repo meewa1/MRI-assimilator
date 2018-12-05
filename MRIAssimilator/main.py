@@ -82,7 +82,7 @@ if __name__ == '__main__':
 			
 		app.aboutToQuit.connect(app.deleteLater)
 		
-		# LoadScreen = utils.resource_path(r"pictures\BrukerSplashScreen.png")
+		# LoadScreen = utils.resource_path(r"pictures\MRIASplashScreen.png")
 		# splashscreen = QSplashScreen(QPixmap(LoadScreen))
 		
 		# splashscreen.show()
@@ -98,15 +98,15 @@ if __name__ == '__main__':
 		from utils import resource_path
 		translator = QTranslator()
 		switchTranslator(translator, 
-						 resource_path(r"translations\BrukerGUI_{}".format(cur_lang)))
+						 resource_path(r"translations\MRIAssimilator_{}".format(cur_lang)))
 
 		# splashscreen.showMessage(app.translate("SplachScreen","Version 1.0 (c) 2018"),
 		# 						 Qt.AlignBottom | Qt.AlignCenter)
 
 		switchQtTranslator(cur_lang)
 
-		from brukerGUI import BrukerMainWindow
-		main = BrukerMainWindow()
+		from MRIA_GUI import MRIAMainWindow
+		main = MRIAMainWindow()
 
 		#splashscreen.finish(main)
 	   # app.installEventFilter(ex)
